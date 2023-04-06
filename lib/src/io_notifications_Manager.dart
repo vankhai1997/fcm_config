@@ -11,9 +11,9 @@ import 'details.dart';
 import 'fcm_config_interface.dart';
 import 'fcm_extension.dart';
 
-final localeNotification = FlutterLocalNotificationsPlugin();
-
 class NotificationManager implements LocaleNotificationInterface {
+  final _localeNotification = FlutterLocalNotificationsPlugin();
+
   /// Drawable icon works only in foreground
   final AndroidNotificationChannel androidNotificationChannel;
 
@@ -25,6 +25,7 @@ class NotificationManager implements LocaleNotificationInterface {
 
   /// remote message stream
   final Stream<RemoteMessage> onRemoteMessage;
+  final StreamController<bool> onMessageOpenApp;
 
   /// tap sink
   final StreamSink<RemoteMessage> tapSink;
@@ -45,6 +46,7 @@ class NotificationManager implements LocaleNotificationInterface {
     required this.appAndroidIcon,
     required this.onRemoteMessage,
     required this.displayInForeground,
+    required this.onMessageOpenApp,
     required this.tapSink,
     required this.iosPresentBadge,
     required this.iosPresentSound,
@@ -55,7 +57,7 @@ class NotificationManager implements LocaleNotificationInterface {
   @override
   Future init() async {
     //! register android channel
-    var impl = localeNotification.resolvePlatformSpecificImplementation<
+    var impl = _localeNotification.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await impl?.createNotificationChannel(androidNotificationChannel);
 
@@ -81,7 +83,7 @@ class NotificationManager implements LocaleNotificationInterface {
       macOS: initializationSettingsDarwin,
       linux: linuxInitializationSettings,
     );
-    await localeNotification.initialize(
+    await _localeNotification.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: _onPayLoad,
     );
@@ -94,6 +96,12 @@ class NotificationManager implements LocaleNotificationInterface {
         displayNotificationFrom(notification);
       }
     });
+
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+        await _localeNotification.getNotificationAppLaunchDetails();
+    if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+      onMessageOpenApp.add(true);
+    }
   }
 
   Future _onPayLoad(NotificationResponse response) async {
@@ -354,7 +362,7 @@ class NotificationManager implements LocaleNotificationInterface {
       var now = DateTime.now();
       id = now.hour + now.minute + now.second + now.millisecond;
     }
-    await localeNotification.show(
+    await _localeNotification.show(
       id,
       message.notification!.title,
       (Platform.isAndroid && bigPictureStyleInformation == null)
@@ -404,7 +412,7 @@ class NotificationManager implements LocaleNotificationInterface {
           title: title,
           body: body,
         ));
-    await localeNotification.show(
+    await _localeNotification.show(
       nId,
       title,
       body,

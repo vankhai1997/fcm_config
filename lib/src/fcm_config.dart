@@ -11,11 +11,14 @@ import 'io_notifications_Manager.dart';
 
 class FCMConfig extends FCMConfigInterface {
   FCMConfig._();
+
   static FCMConfig? _instance;
+
   static FCMConfig get instance => _instance ??= FCMConfig._();
 
   FirebaseMessaging get messaging => FirebaseMessaging.instance;
   LocaleNotificationInterface? _localeNotification;
+
   LocaleNotificationInterface get local {
     if (_localeNotification == null) {
       throw Exception('you must call init before use this value');
@@ -29,6 +32,7 @@ class FCMConfig extends FCMConfigInterface {
       StreamController<RemoteMessage>.broadcast();
   final StreamController<bool> _onTapOpenedApp =
       StreamController<bool>.broadcast();
+
   @override
   Stream<RemoteMessage> get onTap => _onTapController.stream;
 
@@ -139,14 +143,8 @@ class FCMConfig extends FCMConfigInterface {
       onRemoteMessage: onMessage,
       tapSink: _onTapController.sink,
       linuxActionName: linuxActionName,
+      onMessageOpenApp: _onTapOpenedApp,
     );
-
-
-    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
-    await localeNotification.getNotificationAppLaunchDetails();
-    if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
-      _onTapOpenedApp.add(true);
-    }
 
     await _localeNotification!.init();
   }
