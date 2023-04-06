@@ -150,6 +150,5 @@ class FCMConfig extends FCMConfigInterface {
   }
 
   @override
-  // TODO: implement onMessageOpenApp
   Stream<bool> get onMessageOpenApp => _onTapOpenedApp.stream;
 }

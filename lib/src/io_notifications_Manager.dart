@@ -97,9 +97,12 @@ class NotificationManager implements LocaleNotificationInterface {
       }
     });
 
+    print('=========init');
     final NotificationAppLaunchDetails? notificationAppLaunchDetails =
         await _localeNotification.getNotificationAppLaunchDetails();
     if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+      print('=========initdidNotificationLaunchApp');
+
       onMessageOpenApp.add(true);
     }
   }
