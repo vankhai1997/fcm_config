@@ -7,8 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'fcm_config_interface.dart';
-import 'io_notifications_manager.dart'
-    if (dart.library.html) 'web_notification_manager.dart';
+import 'io_notifications_Manager.dart';
 
 class FCMConfig extends FCMConfigInterface {
   FCMConfig._();
@@ -28,6 +27,8 @@ class FCMConfig extends FCMConfigInterface {
   Stream<RemoteMessage> get onMessage => FirebaseMessaging.onMessage;
   final StreamController<RemoteMessage> _onTapController =
       StreamController<RemoteMessage>.broadcast();
+  final StreamController<bool> _onTapOpenedApp =
+      StreamController<bool>.broadcast();
   @override
   Stream<RemoteMessage> get onTap => _onTapController.stream;
 
@@ -140,6 +141,17 @@ class FCMConfig extends FCMConfigInterface {
       linuxActionName: linuxActionName,
     );
 
+
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails =
+    await localeNotification.getNotificationAppLaunchDetails();
+    if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+      _onTapOpenedApp.add(true);
+    }
+
     await _localeNotification!.init();
   }
+
+  @override
+  // TODO: implement onMessageOpenApp
+  Stream<bool> get onMessageOpenApp => _onTapOpenedApp.stream;
 }

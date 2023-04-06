@@ -12,9 +12,15 @@ import 'details.dart';
 
 abstract class FCMConfigInterface {
   Future<RemoteMessage?> getInitialMessage();
+
   Stream<RemoteMessage> get onMessage;
+
+  Stream<bool> get onMessageOpenApp;
+
   Stream<RemoteMessage> get onTap;
+
   static FirebaseMessaging get messaging => FirebaseMessaging.instance;
+
   Future init({
     /// this function will be executed while application is in background
     /// Not work on the web
@@ -79,6 +85,7 @@ abstract class FCMConfigInterface {
 
 abstract class LocaleNotificationInterface {
   Future<RemoteMessage?> getInitialMessage();
+
   Future init();
 
   Future displayNotification({

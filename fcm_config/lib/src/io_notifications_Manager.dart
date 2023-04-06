@@ -11,9 +11,9 @@ import 'details.dart';
 import 'fcm_config_interface.dart';
 import 'fcm_extension.dart';
 
-class NotificationManager implements LocaleNotificationInterface {
-  final _localeNotification = FlutterLocalNotificationsPlugin();
+final localeNotification = FlutterLocalNotificationsPlugin();
 
+class NotificationManager implements LocaleNotificationInterface {
   /// Drawable icon works only in foreground
   final AndroidNotificationChannel androidNotificationChannel;
 
@@ -39,6 +39,7 @@ class NotificationManager implements LocaleNotificationInterface {
   /// ios notification sound
   final bool iosPresentSound;
   final String linuxActionName;
+
   NotificationManager({
     required this.androidNotificationChannel,
     required this.appAndroidIcon,
@@ -54,7 +55,7 @@ class NotificationManager implements LocaleNotificationInterface {
   @override
   Future init() async {
     //! register android channel
-    var impl = _localeNotification.resolvePlatformSpecificImplementation<
+    var impl = localeNotification.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await impl?.createNotificationChannel(androidNotificationChannel);
 
@@ -80,7 +81,7 @@ class NotificationManager implements LocaleNotificationInterface {
       macOS: initializationSettingsDarwin,
       linux: linuxInitializationSettings,
     );
-    await _localeNotification.initialize(
+    await localeNotification.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: _onPayLoad,
     );
@@ -353,7 +354,7 @@ class NotificationManager implements LocaleNotificationInterface {
       var now = DateTime.now();
       id = now.hour + now.minute + now.second + now.millisecond;
     }
-    await _localeNotification.show(
+    await localeNotification.show(
       id,
       message.notification!.title,
       (Platform.isAndroid && bigPictureStyleInformation == null)
@@ -403,7 +404,7 @@ class NotificationManager implements LocaleNotificationInterface {
           title: title,
           body: body,
         ));
-    await _localeNotification.show(
+    await localeNotification.show(
       nId,
       title,
       body,
